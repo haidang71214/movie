@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model banner {
+  banner_id Int     @id @default(autoincrement())
+  movie_id  Int?
+  image_url String? @db.VarChar(255)
+  movie     movie?  @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction, map: "banner_ibfk_1")
+
+  @@index([movie_id], map: "movie_id")
+}
+
+model booking {
+  account_id Int
+  show_id    Int
+  seat_id    Int
+  users      users     @relation(fields: [account_id], references: [account_id], onDelete: NoAction, onUpdate: NoAction, map: "booking_ibfk_1")
+  show_time  show_time @relation(fields: [show_id], references: [show_id], onDelete: NoAction, onUpdate: NoAction, map: "booking_ibfk_2")
+  seat       seat      @relation(fields: [seat_id], references: [seat_id], onDelete: NoAction, onUpdate: NoAction, map: "booking_ibfk_3")
+
+  @@id([account_id, show_id, seat_id])
+  @@index([seat_id], map: "seat_id")
+  @@index([show_id], map: "show_id")
+}
+
+model cinema_cluster {
+  cluster_id    Int            @id @default(autoincrement())
+  cluster_name  String         @db.VarChar(255)
+  address       String?        @db.VarChar(255)
+  system_id     Int?
+  cinema_system cinema_system? @relation(fields: [system_id], references: [system_id], onDelete: NoAction, onUpdate: NoAction, map: "cinema_cluster_ibfk_1")
+  cinema_room   cinema_room[]
+
+  @@index([system_id], map: "system_id")
+}
+
+model cinema_room {
+  room_id        Int             @id @default(autoincrement())
+  room_name      String          @db.VarChar(255)
+  cluster_id     Int?
+  cinema_cluster cinema_cluster? @relation(fields: [cluster_id], references: [cluster_id], onDelete: NoAction, onUpdate: NoAction, map: "cinema_room_ibfk_1")
+  seat           seat[]
+  show_time      show_time[]
+
+  @@index([cluster_id], map: "cluster_id")
+}
+
+model cinema_system {
+  system_id      Int              @id @default(autoincrement())
+  system_name    String           @db.VarChar(255)
+  logo           String?          @db.VarChar(255)
+  cinema_cluster cinema_cluster[]
+}
+
+model movie {
+  movie_id     Int         @id @default(autoincrement())
+  movie_name   String      @db.VarChar(255)
+  trailer      String?     @db.VarChar(255)
+  image_url    String?     @db.VarChar(255)
+  description  String?     @db.Text
+  release_date DateTime?   @db.Date
+  rating       Int?
+  is_hot       Boolean?    @default(false)
+  is_showing   Boolean?    @default(false)
+  is_coming    Boolean?    @default(false)
+  banner       banner[]
+  show_time    show_time[]
+}
+
+model seat {
+  seat_id     Int          @id @default(autoincrement())
+  seat_name   String?      @db.VarChar(50)
+  seat_type   String?      @db.VarChar(50)
+  room_id     Int?
+  booking     booking[]
+  cinema_room cinema_room? @relation(fields: [room_id], references: [room_id], onDelete: NoAction, onUpdate: NoAction, map: "seat_ibfk_1")
+
+  @@index([room_id], map: "room_id")
+}
+
+model show_time {
+  show_id       Int          @id @default(autoincrement())
+  room_id       Int?
+  movie_id      Int?
+  show_datetime DateTime?    @db.DateTime(0)
+  ticket_price  Int?
+  booking       booking[]
+  cinema_room   cinema_room? @relation(fields: [room_id], references: [room_id], onDelete: NoAction, onUpdate: NoAction, map: "show_time_ibfk_1")
+  movie         movie?       @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction, map: "show_time_ibfk_2")
+
+  @@index([movie_id], map: "movie_id")
+  @@index([room_id], map: "room_id")
+}
+
+model users {
+  account_id    Int       @id @default(autoincrement())
+  full_name     String?   @db.VarChar(255)
+  email         String?   @unique(map: "email") @db.VarChar(255)
+  phone_number  String?   @db.VarChar(20)
+  password      String?   @db.VarChar(255)
+  user_type     String?   @db.VarChar(50)
+  refresh_token String?   @db.Text
+  face_id       String?   @db.VarChar(225)
+  avartar_url   String?   @db.Text
+  access_token  String?   @db.Text
+  booking       booking[]
+}
