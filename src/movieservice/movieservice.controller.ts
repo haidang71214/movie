@@ -70,7 +70,8 @@ export class MovieserviceController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Delete('delete-movie-id/:id')
-  async remove(@Param('id') id: number,
+  async remove(
+    @Param('id') id: number,
   @Req() req
 ) {
     const checkAdmin = req.user.userId

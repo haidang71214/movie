@@ -24,21 +24,22 @@ async getCinema(@Query('system_name') system_name?: string): Promise<cinemaDto[]
   findAll():Promise<cinemaDto[]> {
     return this.cinemaService.findAll();
   }
-  //
-  @Get('/get-cinema-cluster/:id')
-  findAllList(@Param('id') id: string
-) {
-    return this.cinemaService.findAllList(id);
-  }
 
-  @Get('/get-cinema-cluster/:id')
-async getCluter(@Param('id') system_id: number): Promise<cinemaSystemDto[]> {
-  return await this.cinemaService.getCluter(system_id);
+  @Get('/get-cinema-cluster/:system_id')
+async getCluter(@Param('system_id') system_id: number): Promise<cinemaSystemDto[]> {
+  return await this.cinemaService.getCluter(+system_id);
 }
-
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cinemaService.remove(+id);
+  @Get('/get-infor-celedar-movie-by-cluster/:clusterId')
+  async getInfor(
+    @Param('clusterId') clusterId:number
+  ){
+    return await this.cinemaService.getInfor(+clusterId)
   }
+  @Get('/get-movie-cleandar-detal/:idMovie')
+  async getInformationCalenderMovie(
+    @Param('idMovie') idMovie:number
+  ){
+    return await this.cinemaService.getInformationCalenderMovie(+idMovie);
+  }
+
 }

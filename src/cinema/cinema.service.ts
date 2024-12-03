@@ -9,8 +9,8 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class CinemaService {
-  constructor(private readonly clusterr:cinemaClutst){}
-  prisma = new PrismaClient()
+  constructor(private readonly clusterr: cinemaClutst) {}
+  prisma = new PrismaClient();
   async getCinema(system_name?: string): Promise<cinemaDto[]> {
     return this.prisma.cinema_system.findMany({
       where: system_name
@@ -18,39 +18,80 @@ export class CinemaService {
         : {}, // Nếu không truyền, trả về tất cả
     });
   }
-  
 
-  async findAll():Promise<cinemaDto[]> {
-    return await this.prisma.cinema_system.findMany()
+  async findAll(): Promise<cinemaDto[]> {
+    return await this.prisma.cinema_system.findMany();
   }
 
   findAllList(id: string) {
     try {
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
+  async getCluter(system_id: number): Promise<cinemaSystemDto[]> {
+    try {
+      const cluster = await this.prisma.cinema_system.findMany({
+        where: { system_id },
+        include: {
+          cinema_cluster: true,
+        },
+      });
+      if (!cluster || cluster.length === 0) {
+        return [];
+      }
+      const cinemaSystemDtos = plainToInstance(cinemaSystemDto, cluster);
+      cinemaSystemDtos.forEach((cinemaSystemDto) => {
+        cinemaSystemDto.cinema_cluster = plainToInstance(
+          cinemaClutst,
+          cinemaSystemDto.cinema_cluster,
+        );
+      });
+
+      return cinemaSystemDtos;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async getInfor(clusterId:number){
+    try {
+      const heeh = await this.prisma.cinema_cluster.findMany({
+        where:{cluster_id:clusterId},
+        include:{
+          cinema_room:{
+            include:{
+              show_time:{
+              include:{
+                movie:true 
+              }
+            }}
+          },
+        },
+      
+      })
+      return heeh
     } catch (error) {
       throw new Error(error)
     }
   }
-
-  async getCluter(system_id: number):Promise<cinemaSystemDto[]> {
+  async getInformationCalenderMovie(idmovie:number){
     try {
-        const cluster = await this.prisma.cinema_system.findMany({
-          where:{system_id},
+        const data = this.prisma.movie.findMany({
+          where:{movie_id:idmovie},
           include:{
-            cinema_cluster:true
+            show_time:{
+              include:{
+                cinema_room:{
+                  include:{cinema_cluster:true}
+                }
+              }
+            }
           }
-        }
-      )
-      if (!cluster || cluster.length === 0) {
-        return [];
-      }
-      return plainToInstance(cinemaSystemDto, cluster);
+        })  
+        return data;
     } catch (error) {
-      
+      throw new  Error(error)
     }
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} cinema`;
   }
 }

@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { MovieserviceModule } from './movieservice/movieservice.module';
 import { CinemaModule } from './cinema/cinema.module';
+import { MainbookModule } from './mainbook/mainbook.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,7 +15,8 @@ import { CinemaModule } from './cinema/cinema.module';
     AuthModule,
     UserModule,
     MovieserviceModule,
-    CinemaModule,  
+    CinemaModule,
+    MainbookModule,  
   ],
   controllers: [AppController],
   providers: [AppService],

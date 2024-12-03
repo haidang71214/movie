@@ -78,6 +78,7 @@ model seat {
   seat_name   String?      @db.VarChar(50)
   seat_type   String?      @db.VarChar(50)
   room_id     Int?
+  user_id     Int?
   booking     booking[]
   cinema_room cinema_room? @relation(fields: [room_id], references: [room_id], onDelete: NoAction, onUpdate: NoAction, map: "seat_ibfk_1")
 
